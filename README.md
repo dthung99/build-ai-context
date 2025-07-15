@@ -1,71 +1,42 @@
-# htool README
+# HTools Summary Tool
 
-This is the README for your extension "htool". After writing up a brief description, we recommend including the following sections.
+A VS Code extension that helps you summarize and extract project files for documentation or analysis purposes.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Project Structure Summary**: Generate a text-based tree view of your project structure
+- **File Tracking**: Track specific files and folders for extraction
+- **Smart Exclusion**: Exclude files/folders from tracking and structure analysis
+- **Flexible Output**: Copy tracked files to a target folder with duplicate handling
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+### Main Command
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+- Run `HTools: Summarize Project`
+- Select target folder (if not configured)
+- The tool will:
+  - Generate `project_structure.txt` with your project tree
+  - Copy all tracked files to the target folder
 
-## Requirements
+### Context Menu Options
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Right-click on files/folders in the Explorer:
 
-## Extension Settings
+- **Track**: Add file/folder to tracking list
+- **Untrack**: Exclude file/folder from tracking
+- **Ignore Structure**: Exclude folder from structure summary
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### Configuration
 
-For example:
+The extension uses workspace settings under `htool.summary-tool`:
 
-This extension contributes the following settings:
+- `target-folder`: Output directory path
+- `track`: List of files/folders to track
+- `untrack`: Patterns to exclude from tracking
+- `ignore-structure`: Patterns to exclude from structure summary
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Installation
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Install from VS Code Marketplace or run:
