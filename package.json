@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/your-repo-name.git"
+    "url": "https://github.com/dthung99/htool"
   },
   "engines": {
     "vscode": "^1.102.0"
