@@ -2,7 +2,7 @@
   "name": "htool",
   "displayName": "Htool",
   "description": "Project summarization and analysis tools",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "dthung",
   "repository": {
     "type": "git",
