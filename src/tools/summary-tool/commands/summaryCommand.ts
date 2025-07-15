@@ -157,7 +157,6 @@ export class SummaryCommand {
 
     const fileResults = await fileTracker.trackAndCopyFiles({
       workspacePath,
-      // TODO: Use it from the config
       targetPath: targetFolder,
       trackPatterns: config.track,
       untrackPatterns: config.untrack,

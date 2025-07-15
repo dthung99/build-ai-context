@@ -47,8 +47,7 @@ function showWelcomeMessage() {
       if (selection === openDocs) {
         // Open documentation (you can add a README link here)
         vscode.env.openExternal(
-          // TODO: Replace with your actual documentation URL
-          vscode.Uri.parse("https://github.com/your-username/htool")
+          vscode.Uri.parse("https://github.com/dthung99/htool")
         );
       } else if (selection === openSettings) {
         vscode.commands.executeCommand(
