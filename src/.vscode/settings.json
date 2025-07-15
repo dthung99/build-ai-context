@@ -1,0 +1,20 @@
+{
+  "htool.summary-tool.track": [
+    "tools",
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "hide-files.files": [],
+  "htool.summary-tool.untrack": [
+  ],
+  "htool.summary-tool.target-folder": "d:\\Desktop\\flatten",
+  "htool.summary-tool.ignore-structure": [
+    "tools\\summary-tool\\services",
+    "tools\\summary-tool\\models"
+  ]
+}

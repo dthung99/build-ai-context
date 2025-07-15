@@ -1,0 +1,140 @@
+{
+  "name": "htool",
+  "displayName": "Htool",
+  "description": "Project summarization and analysis tools",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:**"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "htool.summary-tool.summarize",
+        "title": "Summarize Project",
+        "category": "Htool"
+      },
+      {
+        "command": "htool.summary-tool.track",
+        "title": "Track for Copy"
+      },
+      {
+        "command": "htool.summary-tool.untrack",
+        "title": "Untrack for Copy"
+      },
+      {
+        "command": "htool.summary-tool.ignore-structure",
+        "title": "Add/Remove from Ignore Folder in Summary"
+      },
+      {
+        "command": "htool.summary-tool.clear-tracking",
+        "title": "Clear All Tracking Settings",
+        "category": "Htool"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "htool.summary-tool.track",
+          "group": "htool@1"
+        },
+        {
+          "command": "htool.summary-tool.untrack",
+          "group": "htool@2"
+        },
+        {
+          "command": "htool.summary-tool.ignore-structure",
+          "group": "htool@3",
+          "when": "explorerResourceIsFolder"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Htool",
+      "properties": {
+        "htool.summary-tool.target-folder": {
+          "type": "string",
+          "default": "",
+          "description": "Default target folder for project summaries"
+        },
+        "htool.summary-tool.track": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "List of files/folders to track for copying"
+        },
+        "htool.summary-tool.untrack": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".venv",
+            ".git",
+            ".vscode",
+            "dist",
+            "build",
+            "out",
+            ".next",
+            "coverage",
+            "*.log",
+            ".DS_Store",
+            "Thumbs.db"
+          ],
+          "description": "List of regex patterns to exclude from copying"
+        },
+        "htool.summary-tool.ignore-structure": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "node_modules",
+            ".venv",
+            ".git",
+            "dist",
+            "build",
+            "out",
+            ".next",
+            "coverage",
+            ".DS_Store",
+            "Thumbs.db"
+          ],
+          "description": "List of regex patterns to exclude from structure summary (show parent only)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/glob-to-regexp": "^0.4.4",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "glob-to-regexp": "^0.4.1"
+  }
+}
