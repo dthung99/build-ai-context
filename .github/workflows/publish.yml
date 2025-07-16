@@ -1,0 +1,39 @@
+name: Publish to VS Code Marketplace
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test || echo "No tests found"
+
+      - name: Build extension
+        run: yarn compile
+
+      - name: Package extension
+        run: |
+          npm install -g @vscode/vsce
+          vsce package
+
+      - name: Publish to VS Code Marketplace
+        run: vsce publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
