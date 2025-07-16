@@ -57,17 +57,19 @@ export interface CommandContext {
   progress?: ProgressReporter;
 }
 
+export const PKG_NAME = "build-ai-context.summary-tool";
+
 export enum SummaryToolCommand {
-  SUMMARIZE = "htool.summary-tool.summarize",
-  ADD_TRACK = "htool.summary-tool.track",
-  ADD_UNTRACK = "htool.summary-tool.untrack",
-  IGNORE_STRUCTURE = "htool.summary-tool.ignore-structure",
-  CLEAR_TRACKING = "htool.summary-tool.clear-tracking",
+  SUMMARIZE = PKG_NAME + ".summarize",
+  ADD_TRACK = PKG_NAME + ".track",
+  ADD_UNTRACK = PKG_NAME + ".untrack",
+  IGNORE_STRUCTURE = PKG_NAME + ".ignore-structure",
+  RESET = PKG_NAME + ".reset",
 }
 
 export enum ConfigKey {
-  TARGET_FOLDER = "htool.summary-tool.target-folder",
-  TRACK = "htool.summary-tool.track",
-  UNTRACK = "htool.summary-tool.untrack",
-  IGNORE_STRUCTURE = "htool.summary-tool.ignore-structure",
+  TARGET_FOLDER = PKG_NAME + ".target-folder",
+  TRACK = PKG_NAME + ".track",
+  UNTRACK = PKG_NAME + ".untrack",
+  IGNORE_STRUCTURE = PKG_NAME + ".ignore-structure",
 }

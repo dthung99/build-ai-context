@@ -1,12 +1,12 @@
 {
-  "name": "htool",
-  "displayName": "Htool",
-  "description": "Project summarization and analysis tools",
-  "version": "0.0.2",
+  "name": "build-ai-context",
+  "displayName": "Build AI Context",
+  "description": "Summarize your project structure and files for sending to AI.",
+  "version": "0.0.1",
   "publisher": "dthung",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dthung99/htool"
+    "url": "https://github.com/dthung99/build-ai-context"
   },
   "engines": {
     "vscode": "^1.102.0"
@@ -21,54 +21,54 @@
   "contributes": {
     "commands": [
       {
-        "command": "htool.summary-tool.summarize",
+        "command": "build-ai-context.summary-tool.summarize",
         "title": "Summarize Project",
-        "category": "Htool"
+        "category": "Build AI Context"
       },
       {
-        "command": "htool.summary-tool.track",
+        "command": "build-ai-context.summary-tool.track",
         "title": "Track for Copy"
       },
       {
-        "command": "htool.summary-tool.untrack",
+        "command": "build-ai-context.summary-tool.untrack",
         "title": "Untrack for Copy"
       },
       {
-        "command": "htool.summary-tool.ignore-structure",
+        "command": "build-ai-context.summary-tool.ignore-structure",
         "title": "Add/Remove from Ignore Folder in Summary"
       },
       {
-        "command": "htool.summary-tool.clear-tracking",
-        "title": "Clear All Tracking Settings",
-        "category": "Htool"
+        "command": "build-ai-context.summary-tool.reset",
+        "title": "Reset All Settings",
+        "category": "Build AI Context"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "htool.summary-tool.track",
-          "group": "htool@1"
+          "command": "build-ai-context.summary-tool.track",
+          "group": "build-ai-context@1"
         },
         {
-          "command": "htool.summary-tool.untrack",
-          "group": "htool@2"
+          "command": "build-ai-context.summary-tool.untrack",
+          "group": "build-ai-context@2"
         },
         {
-          "command": "htool.summary-tool.ignore-structure",
-          "group": "htool@3",
+          "command": "build-ai-context.summary-tool.ignore-structure",
+          "group": "build-ai-context@3",
           "when": "explorerResourceIsFolder"
         }
       ]
     },
     "configuration": {
-      "title": "Htool",
+      "title": "Build AI Context",
       "properties": {
-        "htool.summary-tool.target-folder": {
+        "build-ai-context.summary-tool.target-folder": {
           "type": "string",
           "default": "",
           "description": "Default target folder for project summaries"
         },
-        "htool.summary-tool.track": {
+        "build-ai-context.summary-tool.track": {
           "type": "array",
           "items": {
             "type": "string"
@@ -76,7 +76,7 @@
           "default": [],
           "description": "List of files/folders to track for copying"
         },
-        "htool.summary-tool.untrack": {
+        "build-ai-context.summary-tool.untrack": {
           "type": "array",
           "items": {
             "type": "string"
@@ -97,7 +97,7 @@
           ],
           "description": "List of regex patterns to exclude from copying"
         },
-        "htool.summary-tool.ignore-structure": {
+        "build-ai-context.summary-tool.ignore-structure": {
           "type": "array",
           "items": {
             "type": "string"

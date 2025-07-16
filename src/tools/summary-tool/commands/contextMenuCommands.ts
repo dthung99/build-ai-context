@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { SummaryToolCommand } from "../models/types";
 import { ConfigManager } from "../services/configManager";
 import { PathUtils } from "../utils/pathUtils";
 
@@ -108,41 +107,21 @@ export class ContextMenuSummaryCommands {
     return ignoreList.includes(relativePath);
   }
 
-  public async clearAllTracking(): Promise<void> {
+  public async reset(): Promise<void> {
     try {
       const confirm = await vscode.window.showWarningMessage(
-        "This will clear all tracking, untrack, and ignore structure settings. Are you sure?",
+        "This will reset all tracking, untrack, and ignore structure settings. Are you sure?",
         { modal: true },
-        "Clear All"
+        "Reset All"
       );
 
-      if (confirm !== "Clear All") {
+      if (confirm !== "Reset All") {
         return;
       }
-
-      // Clear all settings
-      await this.configManager.updateTargetFolder("");
-      await vscode.workspace
-        .getConfiguration()
-        .update(
-          SummaryToolCommand.ADD_TRACK,
-          [],
-          vscode.ConfigurationTarget.Workspace
-        );
-      await vscode.workspace
-        .getConfiguration()
-        .update(
-          SummaryToolCommand.ADD_UNTRACK,
-          [],
-          vscode.ConfigurationTarget.Workspace
-        );
-      await vscode.workspace
-        .getConfiguration()
-        .update(
-          "htool.summary-tool.ignore-structure",
-          [],
-          vscode.ConfigurationTarget.Workspace
-        );
+      await this.configManager.resetAllConfig();
+      vscode.window.showInformationMessage(
+        "All tracking settings have been reset to defaults."
+      );
     } catch (error) {
       vscode.window.showErrorMessage(`Error clearing tracking: ${error}`);
       console.error("Clear tracking error:", error);

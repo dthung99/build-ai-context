@@ -35,9 +35,9 @@ export class SummaryToolCommands {
       (uri: vscode.Uri) => this.contextMenuCommands.toggleIgnoreStructure(uri)
     );
 
-    const clearTrackingCommand = vscode.commands.registerCommand(
-      "htool.summary-tool.clear-tracking",
-      () => this.contextMenuCommands.clearAllTracking()
+    const resetSettingsCommand = vscode.commands.registerCommand(
+      SummaryToolCommand.RESET,
+      () => this.contextMenuCommands.reset()
     );
 
     // Register all commands with the extension context
@@ -46,7 +46,7 @@ export class SummaryToolCommands {
       trackCommand,
       untrackCommand,
       ignoreStructureCommand,
-      clearTrackingCommand
+      resetSettingsCommand
     );
   }
 }

@@ -1,4 +1,4 @@
-# Htool - Project Summary Tool
+# Build AI Context
 
 A VS Code extension that helps you summarize project structures and extract specific files for documentation, analysis, or sharing purposes.
 
@@ -29,7 +29,7 @@ A VS Code extension that helps you summarize project structures and extract spec
 ### Main Command
 
 1. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. Run **"Htool: Summarize Project"**
+2. Run **"Build AI Context: Summarize Project"**
 3. Select or configure target folder
 4. The tool will:
    - Generate `project_structure.txt` with your project tree
@@ -46,11 +46,11 @@ Right-click on files/folders in the Explorer:
 
 ### Additional Commands
 
-- **"Clear All Tracking Settings"**: Reset all tracking, untrack, and ignore settings
+- **"Reset All Settings"**: Reset all tracking, untrack, and ignore settings
 
 ## Configuration
 
-The extension uses workspace settings under `htool.summary-tool.*`:
+The extension uses workspace settings under `build-ai-context.summary-tool.*`:
 
 ### Settings
 
@@ -128,11 +128,7 @@ The extension creates:
 
 ## Installation
 
-1. Install from VS Code Marketplace
-2. Or download the `.vsix` file and install manually:
-   ```
-   code --install-extension htool-0.0.1.vsix
-   ```
+- Install from VS Code Marketplace
 
 ## Development
 

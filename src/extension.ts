@@ -3,7 +3,7 @@ import { registerSummaryToolCommands } from "./tools/summary-tool/commands";
 
 // Extension activation
 export function activate(context: vscode.ExtensionContext) {
-  console.log("Htool extension is now active!");
+  console.log("Build AI Context extension is now active!");
 
   try {
     // Register summary tool commands
@@ -11,32 +11,32 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Show welcome message on first activation
     const isFirstActivation = context.globalState.get(
-      "htool.firstActivation",
+      "build-ai-context.firstActivation",
       true
     );
     if (isFirstActivation) {
       showWelcomeMessage();
-      context.globalState.update("htool.firstActivation", false);
+      context.globalState.update("build-ai-context.firstActivation", false);
     }
 
-    console.log("Htool extension activated successfully");
+    console.log("Build AI Context extension activated successfully");
   } catch (error) {
-    console.error("Error activating Htool extension:", error);
+    console.error("Error activating Build AI Context extension:", error);
     vscode.window.showErrorMessage(
-      `Failed to activate Htool extension: ${error}`
+      `Failed to activate Build AI Context extension: ${error}`
     );
   }
 }
 
 // Extension deactivation
 export function deactivate() {
-  console.log("Htool extension is being deactivated");
+  console.log("Build AI Context extension is being deactivated");
   // Cleanup will be handled by disposal of context subscriptions
 }
 
 // Helper functions
 function showWelcomeMessage() {
-  const message = "Welcome to Htool! 🎉";
+  const message = "Welcome to Build AI Context! 🎉";
 
   const openDocs = "Open Documentation";
   const openSettings = "Open Settings";
@@ -47,12 +47,12 @@ function showWelcomeMessage() {
       if (selection === openDocs) {
         // Open documentation (you can add a README link here)
         vscode.env.openExternal(
-          vscode.Uri.parse("https://github.com/dthung99/htool")
+          vscode.Uri.parse("https://github.com/dthung99/build-ai-context")
         );
       } else if (selection === openSettings) {
         vscode.commands.executeCommand(
           "workbench.action.openSettings",
-          "htool"
+          "build-ai-context"
         );
       }
     });

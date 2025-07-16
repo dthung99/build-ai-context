@@ -16,7 +16,6 @@ export class SummaryCommand {
   public async execute(): Promise<void> {
     try {
       // Check if workspace is open
-      this.configManager.refreshConfig();
       const workspacePath = this.configManager.getWorkspacePath();
       if (!workspacePath) {
         vscode.window.showErrorMessage("No workspace folder is open");
