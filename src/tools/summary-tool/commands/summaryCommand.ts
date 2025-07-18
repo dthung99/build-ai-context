@@ -23,7 +23,44 @@ export class SummaryCommand {
       }
 
       // Get or prompt for target folder
-      const targetFolder = await this.getTargetFolder();
+      let targetFolder = await this.getTargetFolder();
+      if (
+        targetFolder !== null &&
+        targetFolder !== "" &&
+        PathUtils.exists(targetFolder)
+      ) {
+        // Ask user if they want to use existing target folder
+        const useExisting = await vscode.window.showQuickPick(
+          [
+            {
+              label: "Use existing target folder",
+              description: targetFolder,
+              target: targetFolder,
+            },
+            {
+              label: "Choose new target folder",
+              description: "Select a different location",
+              target: null,
+            },
+          ],
+          {
+            placeHolder: "Select target folder for summary output",
+            ignoreFocusOut: true,
+          }
+        );
+
+        if (!useExisting) {
+          return; // User cancelled
+        }
+
+        if (useExisting.target === null) {
+          targetFolder =
+            await this.configManager.showSelectTargetFolderDialog();
+        }
+      } else {
+        targetFolder = await this.configManager.showSelectTargetFolderDialog();
+      }
+
       if (!targetFolder) {
         return; // User cancelled
       }
@@ -78,45 +115,10 @@ export class SummaryCommand {
     }
   }
 
-  private async getTargetFolder(): Promise<string | null> {
+  private getTargetFolder(): string | null {
     try {
       const config = this.configManager.getConfig();
-
-      // TODO: It's asking the user to choose but not saving their choice.
-      if (config.targetFolder && PathUtils.exists(config.targetFolder)) {
-        // Ask user if they want to use existing target folder
-        const useExisting = await vscode.window.showQuickPick(
-          [
-            {
-              label: "Use existing target folder",
-              description: config.targetFolder,
-              target: config.targetFolder,
-            },
-            {
-              label: "Choose new target folder",
-              description: "Select a different location",
-              target: null,
-            },
-          ],
-          {
-            placeHolder: "Select target folder for summary output",
-            ignoreFocusOut: true,
-          }
-        );
-
-        if (!useExisting) {
-          return null; // User cancelled
-        }
-
-        if (useExisting.target === null) {
-          return await this.configManager.showSelectTargetFolderDialog();
-        }
-
-        return useExisting.target;
-      }
-
-      // Prompt for new target folder
-      return await this.configManager.showSelectTargetFolderDialog();
+      return config.targetFolder;
     } catch (error) {
       console.error("Error getting target folder:", error);
       return null;
@@ -197,13 +199,12 @@ export class SummaryCommand {
       openStructure
     );
 
+    const targetPath = (await this.getTargetFolder()) ?? "";
+
     if (action === openFolder) {
-      await vscode.env.openExternal(vscode.Uri.file(result.targetPath));
+      await vscode.env.openExternal(vscode.Uri.file(targetPath));
     } else if (action === openStructure) {
-      const structurePath = path.join(
-        result.targetPath,
-        "project_structure.txt"
-      );
+      const structurePath = path.join(targetPath, "project_structure.txt");
       await vscode.commands.executeCommand(
         "vscode.open",
         vscode.Uri.file(structurePath)

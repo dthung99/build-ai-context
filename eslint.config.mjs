@@ -30,6 +30,7 @@ export default [
       "no-throw-literal": "warn",
       semi: "warn",
       "@typescript-eslint/no-unused-vars": "warn",
+      "no-console": ["warn", { allow: ["warn", "error", "info"] }],
     },
   },
 ];

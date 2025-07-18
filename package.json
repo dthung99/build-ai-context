@@ -2,7 +2,7 @@
   "name": "build-ai-context",
   "displayName": "Build AI Context",
   "description": "Summarize your project structure and files for sending to AI.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "dthung",
   "repository": {
     "type": "git",
@@ -84,6 +84,7 @@
           "default": [
             "node_modules",
             ".venv",
+            "__pycache__",
             ".git",
             ".vscode",
             "dist",
@@ -105,6 +106,7 @@
           "default": [
             "node_modules",
             ".venv",
+            "__pycache__",
             ".git",
             "dist",
             "build",
