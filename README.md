@@ -2,6 +2,8 @@
 
 A VS Code extension that helps you summarize project structures and extract specific files for documentation, analysis, or sharing purposes.
 
+https://github.com/user-attachments/assets/bd28c266-579f-4903-bf82-6bda818a1af5
+
 ## Features
 
 ### 📁 Project Structure Summary
