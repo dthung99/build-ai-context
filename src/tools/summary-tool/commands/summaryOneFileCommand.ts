@@ -6,7 +6,7 @@ import { FileTracker } from "../services/fileTracker";
 import { StructureSummarizer } from "../services/structureSummarizer";
 import { PathUtils } from "../utils/pathUtils";
 
-export class SummaryCommand {
+export class SummaryOneFileCommand {
   private configManager: ConfigManager;
 
   constructor() {
@@ -65,39 +65,11 @@ export class SummaryCommand {
         return; // User cancelled
       }
 
-      // Check if target folder empty
-      if (!PathUtils.isDirectoryEmpty(targetFolder)) {
-        const confirm = await vscode.window.showInformationMessage(
-          "Target folder is not empty. Do you want to proceed?",
-          { modal: true },
-          "Delete Files And Proceed",
-          "Proceed"
-        );
-
-        if (confirm === "Proceed") {
-          // User chose to proceed without deleting
-          vscode.window.setStatusBarMessage(
-            "Proceeding with existing files in target folder."
-          );
-        }
-
-        if (confirm === "Delete Files And Proceed") {
-          vscode.window.setStatusBarMessage(
-            "Deleting existing files in target folder and proceeding."
-          );
-          PathUtils.deleteFilesInDirectory(targetFolder);
-        }
-
-        if (!confirm) {
-          return; // User cancelled
-        }
-      }
-
       // Show progress and execute summary
       await vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: "Summarizing Project",
+          title: "Generating Single File Summary",
           cancellable: false,
         },
         async (progress) => {
@@ -111,7 +83,7 @@ export class SummaryCommand {
       );
     } catch (error) {
       vscode.window.showErrorMessage(`Error during project summary: ${error}`);
-      console.error("Summary command error:", error);
+      console.error("Summary one file command error:", error);
     }
   }
 
@@ -151,64 +123,58 @@ export class SummaryCommand {
       ignoreStructurePatterns: config.ignoreStructure,
     });
 
-    const structureFilePath = path.join(targetFolder, "project_structure.txt");
-    await structureSummarizer.saveStructureToFile(structure, structureFilePath);
+    const outputFilePath = path.join(targetFolder, "project_structure.txt");
+    await structureSummarizer.saveStructureToFile(structure, outputFilePath);
 
     progress.report({ message: "Structure analysis complete", increment: 30 });
 
-    // Phase 2: Track and copy files
+    // Phase 2: Append tracked files content
     progress.report({ message: "Processing tracked files...", increment: 30 });
 
-    const fileResults = await fileTracker.trackAndCopyFiles({
+    const fileResults = await fileTracker.trackAndWriteToSingleFile({
       workspacePath,
-      targetPath: targetFolder,
+      targetPath: outputFilePath,
       trackPatterns: config.track,
       untrackPatterns: config.untrack,
     });
 
-    progress.report({ message: "File copying complete", increment: 60 });
-
-    // Phase 3: Save structure summary to file
-    progress.report({ message: "Saving structure summary...", increment: 80 });
-
-    progress.report({ message: "All steps finished!", increment: 100 });
+    progress.report({
+      message: "Single file generation complete!",
+      increment: 100,
+    });
 
     return {
       structure,
       trackedFiles: fileResults.trackedFiles,
-      copiedFiles: fileResults.copiedFiles,
-      skippedFiles: fileResults.skippedFiles,
+      copiedFiles: 1, // We generated 1 combined file
+      skippedFiles: 0,
       totalFiles: fileResults.totalFiles,
-      targetPath: targetFolder,
+      targetPath: outputFilePath,
     };
   }
 
   private async showResults(result: SummaryResult): Promise<void> {
     const message =
-      `🎉 Project summary completed! ` +
-      `Files copied: ${result.copiedFiles}, ` +
-      `Files skipped: ${result.skippedFiles}, ` +
-      `Total files: ${result.totalFiles}.`;
+      `🎉 Single file summary completed! ` +
+      `Generated 1 combined file with ${result.totalFiles} files included.`;
 
+    const openFile = "Open Combined File";
     const openFolder = "Open Output Folder";
-    const openStructure = "Open Structure File";
 
     const action = await vscode.window.showInformationMessage(
       message,
-      openFolder,
-      openStructure
+      openFile,
+      openFolder
     );
 
-    const targetPath = (await this.getTargetFolder()) ?? "";
-
-    if (action === openFolder) {
-      await vscode.env.openExternal(vscode.Uri.file(targetPath));
-    } else if (action === openStructure) {
-      const structurePath = path.join(targetPath, "project_structure.txt");
+    if (action === openFile) {
       await vscode.commands.executeCommand(
         "vscode.open",
-        vscode.Uri.file(structurePath)
+        vscode.Uri.file(result.targetPath)
       );
+    } else if (action === openFolder) {
+      const folderPath = PathUtils.getDirName(result.targetPath);
+      await vscode.env.openExternal(vscode.Uri.file(folderPath));
     }
   }
 }

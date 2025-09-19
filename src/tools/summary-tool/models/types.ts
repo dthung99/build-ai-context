@@ -61,6 +61,7 @@ export const PKG_NAME = "build-ai-context.summary-tool";
 
 export enum SummaryToolCommand {
   SUMMARIZE = PKG_NAME + ".summarize",
+  SUMMARIZE_ONE_FILE = PKG_NAME + ".summarize-one-file",
   ADD_TRACK = PKG_NAME + ".track",
   ADD_UNTRACK = PKG_NAME + ".untrack",
   IGNORE_STRUCTURE = PKG_NAME + ".ignore-structure",

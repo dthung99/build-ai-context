@@ -81,6 +81,83 @@ export class FileTracker {
     };
   }
 
+  public async trackAndWriteToSingleFile(
+    options: FileTrackingOptions
+  ): Promise<{
+    totalFiles: number;
+    trackedFiles: string[];
+    outputPath: string;
+  }> {
+    const { workspacePath, targetPath, trackPatterns } = options;
+
+    // Reset counters
+    this.copiedFiles = 0;
+    this.skippedFiles = 0;
+
+    // Ensure target directory exists
+    PathUtils.ensureFileExists(targetPath);
+
+    this.progress?.report({ message: "Analyzing tracked files..." });
+
+    // Get all tracked items
+    const trackedItems = await this.getTrackedItems(
+      workspacePath,
+      trackPatterns
+    );
+
+    // Expand directories to get all files
+    const allFiles = await this.expandTrackedItems(trackedItems);
+
+    this.progress?.report({
+      message: `Found ${allFiles.length} files to copy...`,
+    });
+
+    // Write to combined content
+    for (let i = 0; i < allFiles.length; i++) {
+      const file = allFiles[i];
+
+      try {
+        await this.appendFileToOutput(file, targetPath);
+
+        // Update progress
+        const progressPercent = ((i + 1) / allFiles.length) * 100;
+        this.progress?.report({
+          message: `Processing: ${path.basename(file.path)}`,
+          increment: progressPercent / allFiles.length,
+        });
+      } catch (error) {
+        console.error(`Error processing file ${file.path}:`, error);
+
+        // Append error message instead of file content
+        const errorHeader =
+          "-".repeat(60) +
+          "\n" +
+          `File: ${file.relativePath}\n` +
+          "-".repeat(60) +
+          "\n" +
+          `Error reading file: ${error}\n`;
+
+        if (i < allFiles.length - 1) {
+          await fs.promises.appendFile(
+            targetPath,
+            errorHeader + "\n\n",
+            "utf8"
+          );
+        } else {
+          await fs.promises.appendFile(targetPath, errorHeader, "utf8");
+        }
+      }
+    }
+
+    this.progress?.report({ message: "Combined file creation complete!" });
+
+    return {
+      totalFiles: allFiles.length,
+      trackedFiles: allFiles.map((file) => file.relativePath),
+      outputPath: targetPath,
+    };
+  }
+
   private async getTrackedItems(
     workspacePath: string,
     trackPatterns: string[]
@@ -202,6 +279,7 @@ export class FileTracker {
 
           if (isSameContent) {
             // Files are identical, no need to copy
+            // eslint-disable-next-line no-console
             console.log(
               `File ${fileName} already exists with same content, skipping copy`
             );
@@ -226,6 +304,57 @@ export class FileTracker {
       this.skippedFiles++;
       return false;
     }
+  }
+
+  private async appendFileToOutput(
+    file: TrackingItem,
+    outputFilePath: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Create header for this file
+      const header =
+        "-".repeat(60) +
+        "\n" +
+        `File: ${file.relativePath}\n` +
+        "-".repeat(60) +
+        "\n";
+
+      // Create streams
+      const readStream = fs.createReadStream(file.path, { encoding: "utf8" });
+      const writeStream = fs.createWriteStream(outputFilePath, {
+        flags: "a", // append mode
+        encoding: "utf8",
+      });
+
+      // Write header first
+      writeStream.write(header);
+
+      // Handle stream events
+      readStream.on("error", (error) => {
+        writeStream.destroy();
+        reject(new Error(`Error reading ${file.path}: ${error.message}`));
+      });
+
+      writeStream.on("error", (error) => {
+        readStream.destroy();
+        reject(new Error(`Error writing to output: ${error.message}`));
+      });
+
+      readStream.on("end", () => {
+        // Add spacing after file content (except for last file)
+        // Note: We can't easily know if this is the last file here,
+        // so we'll add spacing and trim at the end if needed
+        writeStream.write("\n\n");
+        writeStream.end();
+      });
+
+      writeStream.on("finish", () => {
+        resolve();
+      });
+
+      // Pipe the file content
+      readStream.pipe(writeStream, { end: false });
+    });
   }
 
   public async calculateTotalSize(

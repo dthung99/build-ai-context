@@ -2,14 +2,17 @@ import * as vscode from "vscode";
 import { SummaryToolCommand } from "../models/types";
 import { ContextMenuSummaryCommands } from "./contextMenuCommands";
 import { SummaryCommand } from "./summaryCommand";
+import { SummaryOneFileCommand } from "./summaryOneFileCommand";
 
 export class SummaryToolCommands {
   private summaryCommand: SummaryCommand;
   private contextMenuCommands: ContextMenuSummaryCommands;
+  private summaryOneFileCommand: SummaryOneFileCommand;
 
   constructor() {
     this.summaryCommand = new SummaryCommand();
     this.contextMenuCommands = new ContextMenuSummaryCommands();
+    this.summaryOneFileCommand = new SummaryOneFileCommand();
   }
 
   public registerCommands(context: vscode.ExtensionContext): void {
@@ -17,6 +20,12 @@ export class SummaryToolCommands {
     const summarizeCommand = vscode.commands.registerCommand(
       SummaryToolCommand.SUMMARIZE,
       () => this.summaryCommand.execute()
+    );
+
+    // Single file summarize command
+    const summarizeOneFileCommand = vscode.commands.registerCommand(
+      SummaryToolCommand.SUMMARIZE_ONE_FILE,
+      () => this.summaryOneFileCommand.execute()
     );
 
     // Context menu commands
@@ -43,6 +52,7 @@ export class SummaryToolCommands {
     // Register all commands with the extension context
     context.subscriptions.push(
       summarizeCommand,
+      summarizeOneFileCommand,
       trackCommand,
       untrackCommand,
       ignoreStructureCommand,

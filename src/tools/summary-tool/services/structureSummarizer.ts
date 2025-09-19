@@ -99,6 +99,8 @@ export class StructureSummarizer {
     output += "====================\n\n";
 
     output += this.printNodeRecursive(structure, 0, true);
+    output +=
+      "\n------------------------------------------------------------\n\n";
 
     return output;
   }

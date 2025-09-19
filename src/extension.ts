@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as vscode from "vscode";
 import { registerSummaryToolCommands } from "./tools/summary-tool/commands";
 

@@ -2,7 +2,7 @@
   "name": "build-ai-context",
   "displayName": "Build AI Context",
   "description": "Summarize your project structure and files for sending to AI.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "dthung",
   "repository": {
     "type": "git",
@@ -23,6 +23,11 @@
       {
         "command": "build-ai-context.summary-tool.summarize",
         "title": "Summarize Project",
+        "category": "Build AI Context"
+      },
+      {
+        "command": "build-ai-context.summary-tool.summarize-one-file",
+        "title": "Summarize Project (Single File)",
         "category": "Build AI Context"
       },
       {

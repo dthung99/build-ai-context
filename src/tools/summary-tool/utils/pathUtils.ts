@@ -39,6 +39,21 @@ export class PathUtils {
   }
 
   /**
+   * Ensure file exists, create if it doesn't (also ensures parent directory)
+   */
+  public static ensureFileExists(filePath: string): void {
+    const dirPath = path.dirname(filePath);
+
+    // First ensure the directory exists
+    this.ensureDirectoryExists(dirPath);
+
+    // Then ensure the file exists
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, ""); // Creates empty file
+    }
+  }
+
+  /**
    * Get unique filename if file already exists in target directory
    */
   public static getUniqueFileName(targetDir: string, fileName: string): string {
