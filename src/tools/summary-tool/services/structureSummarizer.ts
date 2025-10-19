@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { STRUCTURE_CONTEXT } from "../constants";
 import {
   FolderNode,
   ProgressReporter,
@@ -94,30 +95,24 @@ export class StructureSummarizer {
     }
   }
 
-  public generateStructureText(structure: FolderNode): string {
-    let output = "Project Structure:\n";
-    output += "====================\n\n";
+  public async generateStructureText(structure: FolderNode): Promise<string> {
+    const compactJson = await this.generateCompactJson(structure);
 
-    output += this.printNodeRecursive(structure, 0, true);
-    output +=
-      "\n------------------------------------------------------------\n\n";
+    // Wrap the structure with context information
+    const wrappedStructure = {
+      context: STRUCTURE_CONTEXT,
+      folder_structure: compactJson,
+    };
 
-    return output;
+    return JSON.stringify(wrappedStructure, null, 2);
   }
 
-  private printNodeRecursive(
-    node: FolderNode,
-    depth: number,
-    isRoot: boolean = false
-  ): string {
-    let output = "";
-    const indent = "  ".repeat(depth);
+  private async generateCompactJson(
+    node: FolderNode
+  ): Promise<Record<string, any>> {
+    const result: Record<string, any> = {};
 
-    if (isRoot) {
-      output += `${node.name}/\n`;
-    }
-
-    // Sort children: directories first, then files
+    // Sort children: directories first, then files, then alphabetically
     const sortedChildren = Object.entries(node.children).sort(
       ([aKey, aChild], [bKey, bChild]) => {
         // Directories (non-null) come first
@@ -133,48 +128,32 @@ export class StructureSummarizer {
       }
     );
 
-    for (let i = 0; i < sortedChildren.length; i++) {
-      const [key, child] = sortedChildren[i];
-      const isLast = i === sortedChildren.length - 1;
-      const prefix = isLast ? "└── " : "├── ";
-
+    for (const [key, child] of sortedChildren) {
       if (child === null) {
         // It's a file
-        output += `${indent}${prefix}${key}\n`;
+        result[key] = 0;
       } else {
         // It's a directory
-        const dirSymbol = child.isIgnored ? "📁 " : "";
-        output += `${indent}${prefix}${dirSymbol}${key}/\n`;
-
-        // Only recurse if not ignored
-        if (!child.isIgnored) {
-          const childIndent = isLast ? "    " : "│   ";
-          const childOutput = this.printNodeRecursive(child, depth + 1);
-          // Replace the first level of indentation with the proper tree structure
-          const lines = childOutput.split("\n").filter((line) => line.trim());
-          for (let j = 0; j < lines.length; j++) {
-            const line = lines[j];
-            output += `${indent}${childIndent}${line.substring(2)}\n`;
-          }
+        if (child.isIgnored) {
+          // Show count of direct items in ignored directory
+          const count = await PathUtils.countDirectItems(child.path);
+          result[key] = count;
         } else {
-          // Show that the directory is hidden
-          output += `${indent}${isLast ? "    " : "│   "}[... hidden ...]\n`;
+          // Recurse into non-ignored directory
+          result[key] = await this.generateCompactJson(child);
         }
       }
     }
 
-    return output;
+    return result;
   }
 
   public async saveStructureToFile(
     structure: FolderNode,
     filePath: string
   ): Promise<void> {
-    // Check file extension to determine format
-    const isJsonFormat = filePath.endsWith('.json');
-    const content = isJsonFormat
-      ? JSON.stringify(structure, null, 2)
-      : this.generateStructureText(structure);
+    // Always generate compact JSON format now
+    const content = await this.generateStructureText(structure);
 
     // Ensure target directory exists
     const targetDir = PathUtils.getDirName(filePath);

@@ -4,9 +4,12 @@
 
 /** Output file names */
 export const OUTPUT_FILES = {
-  PROJECT_STRUCTURE: "project_structure.json",
+  PROJECT_STRUCTURE: "folder_structure.json",
   COMBINED_FILES: "combined_files.txt",
 } as const;
+
+/** Structure context description so AI could understand the JSON */
+export const STRUCTURE_CONTEXT = "This JSON describes the project structure. Files are represented with value 0. Folders that are ignored/collapsed show a number indicating how many direct children (files + folders) they contain. Non-ignored folders are expanded as nested objects.";
 
 /** UI Messages */
 export const MESSAGES = {

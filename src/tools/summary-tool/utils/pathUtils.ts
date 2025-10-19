@@ -249,4 +249,18 @@ export class PathUtils {
       console.error(`Error deleting files in directory: ${error}`);
     }
   }
+
+  /**
+   * Count direct children (files + folders) in a directory
+   * Does NOT count items in subdirectories
+   */
+  public static async countDirectItems(dirPath: string): Promise<number> {
+    try {
+      const items = await fs.promises.readdir(dirPath);
+      return items.length;
+    } catch (error) {
+      console.error(`Error counting items in directory ${dirPath}:`, error);
+      return 0;
+    }
+  }
 }
