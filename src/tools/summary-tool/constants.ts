@@ -4,7 +4,8 @@
 
 /** Output file names */
 export const OUTPUT_FILES = {
-  PROJECT_STRUCTURE: "project_structure.txt",
+  PROJECT_STRUCTURE: "project_structure.json",
+  COMBINED_FILES: "combined_files.txt",
 } as const;
 
 /** UI Messages */

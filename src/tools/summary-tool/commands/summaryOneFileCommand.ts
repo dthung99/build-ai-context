@@ -124,17 +124,19 @@ export class SummaryOneFileCommand {
       ignoreStructurePatterns: config.ignoreStructure,
     });
 
-    const outputFilePath = path.join(targetFolder, OUTPUT_FILES.PROJECT_STRUCTURE);
-    await structureSummarizer.saveStructureToFile(structure, outputFilePath);
+    // Save structure to separate JSON file
+    const structureFilePath = path.join(targetFolder, OUTPUT_FILES.PROJECT_STRUCTURE);
+    await structureSummarizer.saveStructureToFile(structure, structureFilePath);
 
     progress.report({ message: PROGRESS.STRUCTURE_COMPLETE, increment: 30 });
 
-    // Phase 2: Append tracked files content
+    // Phase 2: Append tracked files content to separate file
     progress.report({ message: PROGRESS.PROCESSING_FILES, increment: 30 });
 
+    const combinedFilePath = path.join(targetFolder, OUTPUT_FILES.COMBINED_FILES);
     const fileResults = await fileTracker.trackAndWriteToSingleFile({
       workspacePath,
-      targetPath: outputFilePath,
+      targetPath: combinedFilePath,
       trackPatterns: config.track,
       untrackPatterns: config.untrack,
     });
@@ -147,21 +149,22 @@ export class SummaryOneFileCommand {
     return {
       structure,
       trackedFiles: fileResults.trackedFiles,
-      copiedFiles: 1, // We generated 1 combined file
+      copiedFiles: 2, // We generated structure.json + combined_files.txt
       skippedFiles: 0,
       totalFiles: fileResults.totalFiles,
-      targetPath: outputFilePath,
+      targetPath: combinedFilePath,
     };
   }
 
   private async showResults(result: SummaryResult): Promise<void> {
     const message =
       `🎉 Single file summary completed! ` +
-      `Generated 1 combined file with ${result.totalFiles} files included.`;
+      `Generated structure.json and combined ${result.totalFiles} files.`;
 
     const action = await vscode.window.showInformationMessage(
       message,
       LABELS.OPEN_COMBINED_FILE,
+      LABELS.OPEN_STRUCTURE,
       LABELS.OPEN_FOLDER
     );
 
@@ -169,6 +172,13 @@ export class SummaryOneFileCommand {
       await vscode.commands.executeCommand(
         "vscode.open",
         vscode.Uri.file(result.targetPath)
+      );
+    } else if (action === LABELS.OPEN_STRUCTURE) {
+      const folderPath = PathUtils.getDirName(result.targetPath);
+      const structurePath = path.join(folderPath, OUTPUT_FILES.PROJECT_STRUCTURE);
+      await vscode.commands.executeCommand(
+        "vscode.open",
+        vscode.Uri.file(structurePath)
       );
     } else if (action === LABELS.OPEN_FOLDER) {
       const folderPath = PathUtils.getDirName(result.targetPath);

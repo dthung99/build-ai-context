@@ -170,7 +170,11 @@ export class StructureSummarizer {
     structure: FolderNode,
     filePath: string
   ): Promise<void> {
-    const content = this.generateStructureText(structure);
+    // Check file extension to determine format
+    const isJsonFormat = filePath.endsWith('.json');
+    const content = isJsonFormat
+      ? JSON.stringify(structure, null, 2)
+      : this.generateStructureText(structure);
 
     // Ensure target directory exists
     const targetDir = PathUtils.getDirName(filePath);
