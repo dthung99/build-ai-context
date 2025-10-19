@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 # Build file
 *.vsix
 .vscode/settings.json
+
+# IDE and AI
+.claude/

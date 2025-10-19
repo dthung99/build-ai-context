@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { OUTPUT_FILES, LABELS, MESSAGES, PROGRESS } from "../constants";
 import { SummaryResult } from "../models/types";
 import { ConfigManager } from "../services/configManager";
 import { FileTracker } from "../services/fileTracker";
@@ -18,7 +19,7 @@ export class SummaryOneFileCommand {
       // Check if workspace is open
       const workspacePath = this.configManager.getWorkspacePath();
       if (!workspacePath) {
-        vscode.window.showErrorMessage("No workspace folder is open");
+        vscode.window.showErrorMessage(MESSAGES.NO_WORKSPACE);
         return;
       }
 
@@ -33,12 +34,12 @@ export class SummaryOneFileCommand {
         const useExisting = await vscode.window.showQuickPick(
           [
             {
-              label: "Use existing target folder",
+              label: LABELS.USE_EXISTING_FOLDER,
               description: targetFolder,
               target: targetFolder,
             },
             {
-              label: "Choose new target folder",
+              label: LABELS.CHOOSE_NEW_FOLDER,
               description: "Select a different location",
               target: null,
             },
@@ -114,7 +115,7 @@ export class SummaryOneFileCommand {
 
     // Phase 1: Generate structure summary
     progress.report({
-      message: "Generating project structure...",
+      message: PROGRESS.GENERATING_STRUCTURE,
       increment: 0,
     });
 
@@ -123,13 +124,13 @@ export class SummaryOneFileCommand {
       ignoreStructurePatterns: config.ignoreStructure,
     });
 
-    const outputFilePath = path.join(targetFolder, "project_structure.txt");
+    const outputFilePath = path.join(targetFolder, OUTPUT_FILES.PROJECT_STRUCTURE);
     await structureSummarizer.saveStructureToFile(structure, outputFilePath);
 
-    progress.report({ message: "Structure analysis complete", increment: 30 });
+    progress.report({ message: PROGRESS.STRUCTURE_COMPLETE, increment: 30 });
 
     // Phase 2: Append tracked files content
-    progress.report({ message: "Processing tracked files...", increment: 30 });
+    progress.report({ message: PROGRESS.PROCESSING_FILES, increment: 30 });
 
     const fileResults = await fileTracker.trackAndWriteToSingleFile({
       workspacePath,
@@ -139,7 +140,7 @@ export class SummaryOneFileCommand {
     });
 
     progress.report({
-      message: "Single file generation complete!",
+      message: PROGRESS.GENERATION_COMPLETE,
       increment: 100,
     });
 
@@ -158,21 +159,18 @@ export class SummaryOneFileCommand {
       `🎉 Single file summary completed! ` +
       `Generated 1 combined file with ${result.totalFiles} files included.`;
 
-    const openFile = "Open Combined File";
-    const openFolder = "Open Output Folder";
-
     const action = await vscode.window.showInformationMessage(
       message,
-      openFile,
-      openFolder
+      LABELS.OPEN_COMBINED_FILE,
+      LABELS.OPEN_FOLDER
     );
 
-    if (action === openFile) {
+    if (action === LABELS.OPEN_COMBINED_FILE) {
       await vscode.commands.executeCommand(
         "vscode.open",
         vscode.Uri.file(result.targetPath)
       );
-    } else if (action === openFolder) {
+    } else if (action === LABELS.OPEN_FOLDER) {
       const folderPath = PathUtils.getDirName(result.targetPath);
       await vscode.env.openExternal(vscode.Uri.file(folderPath));
     }

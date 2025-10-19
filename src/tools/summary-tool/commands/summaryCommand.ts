@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import { OUTPUT_FILES, LABELS, MESSAGES, PROGRESS } from "../constants";
 import { SummaryResult } from "../models/types";
 import { ConfigManager } from "../services/configManager";
 import { FileTracker } from "../services/fileTracker";
@@ -18,7 +19,7 @@ export class SummaryCommand {
       // Check if workspace is open
       const workspacePath = this.configManager.getWorkspacePath();
       if (!workspacePath) {
-        vscode.window.showErrorMessage("No workspace folder is open");
+        vscode.window.showErrorMessage(MESSAGES.NO_WORKSPACE);
         return;
       }
 
@@ -33,12 +34,12 @@ export class SummaryCommand {
         const useExisting = await vscode.window.showQuickPick(
           [
             {
-              label: "Use existing target folder",
+              label: LABELS.USE_EXISTING_FOLDER,
               description: targetFolder,
               target: targetFolder,
             },
             {
-              label: "Choose new target folder",
+              label: LABELS.CHOOSE_NEW_FOLDER,
               description: "Select a different location",
               target: null,
             },
@@ -68,20 +69,20 @@ export class SummaryCommand {
       // Check if target folder empty
       if (!PathUtils.isDirectoryEmpty(targetFolder)) {
         const confirm = await vscode.window.showInformationMessage(
-          "Target folder is not empty. Do you want to proceed?",
+          MESSAGES.FOLDER_NOT_EMPTY,
           { modal: true },
-          "Delete Files And Proceed",
-          "Proceed"
+          LABELS.DELETE_AND_PROCEED,
+          LABELS.PROCEED
         );
 
-        if (confirm === "Proceed") {
+        if (confirm === LABELS.PROCEED) {
           // User chose to proceed without deleting
           vscode.window.setStatusBarMessage(
             "Proceeding with existing files in target folder."
           );
         }
 
-        if (confirm === "Delete Files And Proceed") {
+        if (confirm === LABELS.DELETE_AND_PROCEED) {
           vscode.window.setStatusBarMessage(
             "Deleting existing files in target folder and proceeding."
           );
@@ -142,7 +143,7 @@ export class SummaryCommand {
 
     // Phase 1: Generate structure summary
     progress.report({
-      message: "Generating project structure...",
+      message: PROGRESS.GENERATING_STRUCTURE,
       increment: 0,
     });
 
@@ -151,13 +152,13 @@ export class SummaryCommand {
       ignoreStructurePatterns: config.ignoreStructure,
     });
 
-    const structureFilePath = path.join(targetFolder, "project_structure.txt");
+    const structureFilePath = path.join(targetFolder, OUTPUT_FILES.PROJECT_STRUCTURE);
     await structureSummarizer.saveStructureToFile(structure, structureFilePath);
 
-    progress.report({ message: "Structure analysis complete", increment: 30 });
+    progress.report({ message: PROGRESS.STRUCTURE_COMPLETE, increment: 30 });
 
     // Phase 2: Track and copy files
-    progress.report({ message: "Processing tracked files...", increment: 30 });
+    progress.report({ message: PROGRESS.PROCESSING_FILES, increment: 30 });
 
     const fileResults = await fileTracker.trackAndCopyFiles({
       workspacePath,
@@ -166,12 +167,12 @@ export class SummaryCommand {
       untrackPatterns: config.untrack,
     });
 
-    progress.report({ message: "File copying complete", increment: 60 });
+    progress.report({ message: PROGRESS.COPYING_COMPLETE, increment: 60 });
 
     // Phase 3: Save structure summary to file
-    progress.report({ message: "Saving structure summary...", increment: 80 });
+    progress.report({ message: PROGRESS.SAVING_STRUCTURE, increment: 80 });
 
-    progress.report({ message: "All steps finished!", increment: 100 });
+    progress.report({ message: PROGRESS.ALL_FINISHED, increment: 100 });
 
     return {
       structure,
@@ -190,21 +191,18 @@ export class SummaryCommand {
       `Files skipped: ${result.skippedFiles}, ` +
       `Total files: ${result.totalFiles}.`;
 
-    const openFolder = "Open Output Folder";
-    const openStructure = "Open Structure File";
-
     const action = await vscode.window.showInformationMessage(
       message,
-      openFolder,
-      openStructure
+      LABELS.OPEN_FOLDER,
+      LABELS.OPEN_STRUCTURE
     );
 
     const targetPath = (await this.getTargetFolder()) ?? "";
 
-    if (action === openFolder) {
+    if (action === LABELS.OPEN_FOLDER) {
       await vscode.env.openExternal(vscode.Uri.file(targetPath));
-    } else if (action === openStructure) {
-      const structurePath = path.join(targetPath, "project_structure.txt");
+    } else if (action === LABELS.OPEN_STRUCTURE) {
+      const structurePath = path.join(targetPath, OUTPUT_FILES.PROJECT_STRUCTURE);
       await vscode.commands.executeCommand(
         "vscode.open",
         vscode.Uri.file(structurePath)
