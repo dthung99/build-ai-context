@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log("Build AI Context extension activated successfully");
   } catch (error) {
     console.error("Error activating Build AI Context extension:", error);
-    vscode.window.showErrorMessage(
+    vscode.window.setStatusBarMessage(
       `Failed to activate Build AI Context extension: ${error}`
     );
   }

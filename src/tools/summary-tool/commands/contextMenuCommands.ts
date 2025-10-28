@@ -21,7 +21,7 @@ export class ContextMenuSummaryCommands {
       // Check if it's untrack
       if (this.configManager.isItemUntracked(itemPath)) {
         await this.configManager.removeFromUntrack(itemPath);
-        vscode.window.showInformationMessage(
+        vscode.window.setStatusBarMessage(
           "Item was removed from untrack list, run again to track it."
         );
         return;
@@ -34,7 +34,7 @@ export class ContextMenuSummaryCommands {
       const stats = await PathUtils.getFileStats(itemPath);
       const itemType = stats?.isFile() ? "file" : "folder";
 
-      vscode.window.showInformationMessage(
+      vscode.window.setStatusBarMessage(
         `Added ${itemType} to tracking: ${relativePath}`
       );
 
@@ -58,7 +58,7 @@ export class ContextMenuSummaryCommands {
       // Check if it's already tracked
       if (this.configManager.isItemTracked(itemPath)) {
         await this.configManager.removeFromTrack(itemPath);
-        vscode.window.showInformationMessage(
+        vscode.window.setStatusBarMessage(
           "Item was removed from track list, run again to untrack it."
         );
         return;
@@ -69,7 +69,7 @@ export class ContextMenuSummaryCommands {
       const itemType = stats?.isFile() ? "file" : "folder";
 
       await this.configManager.addToUntrack(itemPath);
-      vscode.window.showInformationMessage(
+      vscode.window.setStatusBarMessage(
         `Removed ${itemType} from tracking: ${relativePath}`
       );
     } catch (error) {
@@ -119,7 +119,7 @@ export class ContextMenuSummaryCommands {
         return;
       }
       await this.configManager.resetAllConfig();
-      vscode.window.showInformationMessage(
+      vscode.window.setStatusBarMessage(
         "All tracking settings have been reset to defaults."
       );
     } catch (error) {

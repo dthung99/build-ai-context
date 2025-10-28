@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 
 export interface SummaryToolConfig {
   targetFolder: string;
+  defaultTargetFolder: string;
   track: string[];
   untrack: string[];
   ignoreStructure: string[];
@@ -70,6 +71,7 @@ export enum SummaryToolCommand {
 
 export enum ConfigKey {
   TARGET_FOLDER = PKG_NAME + ".target-folder",
+  DEFAULT_TARGET_FOLDER = PKG_NAME + ".default-target-folder",
   TRACK = PKG_NAME + ".track",
   UNTRACK = PKG_NAME + ".untrack",
   IGNORE_STRUCTURE = PKG_NAME + ".ignore-structure",

@@ -71,7 +71,12 @@
         "build-ai-context.summary-tool.target-folder": {
           "type": "string",
           "default": "",
-          "description": "Default target folder for project summaries"
+          "description": "Last used target folder for project summaries"
+        },
+        "build-ai-context.summary-tool.default-target-folder": {
+          "type": "string",
+          "default": ".claude/contexts",
+          "description": "Global default target folder (relative to workspace root)"
         },
         "build-ai-context.summary-tool.track": {
           "type": "array",

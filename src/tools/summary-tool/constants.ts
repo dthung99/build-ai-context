@@ -9,7 +9,8 @@ export const OUTPUT_FILES = {
 } as const;
 
 /** Structure context description so AI could understand the JSON */
-export const STRUCTURE_CONTEXT = "This JSON describes the project structure. Files are represented with value 0. Folders that are ignored/collapsed show a number indicating how many direct children (files + folders) they contain. Non-ignored folders are expanded as nested objects.";
+export const STRUCTURE_CONTEXT =
+  "This JSON describes the project structure. Files are represented with value 0. Folders that are ignored/collapsed show a number indicating how many direct children (files + folders) they contain. Non-ignored folders are expanded as nested objects.";
 
 /** UI Messages */
 export const MESSAGES = {
@@ -26,6 +27,7 @@ export const LABELS = {
   OPEN_COMBINED_FILE: "Open Combined File",
   USE_EXISTING_FOLDER: "Use existing target folder",
   CHOOSE_NEW_FOLDER: "Choose new target folder",
+  USE_GLOBAL_CONFIG_FOLDER: "Use global config target folder",
 } as const;
 
 /** Progress messages */

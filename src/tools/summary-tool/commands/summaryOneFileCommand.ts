@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { OUTPUT_FILES, LABELS, MESSAGES, PROGRESS } from "../constants";
+import { LABELS, MESSAGES, OUTPUT_FILES, PROGRESS } from "../constants";
 import { SummaryResult } from "../models/types";
 import { ConfigManager } from "../services/configManager";
 import { FileTracker } from "../services/fileTracker";
@@ -24,42 +24,57 @@ export class SummaryOneFileCommand {
       }
 
       // Get or prompt for target folder
-      let targetFolder = await this.getTargetFolder();
+      let targetFolder = await this.configManager.getTargetFolder();
+      const defaultTargetFolder =
+        this.configManager.getDefaultTargetFolderPath();
+
+      // Pick options
+      const pickOptions: {
+        label: string;
+        description: string;
+        target: string | null;
+      }[] = [
+        {
+          label: LABELS.USE_GLOBAL_CONFIG_FOLDER,
+          description: defaultTargetFolder,
+          target: defaultTargetFolder,
+        },
+        {
+          label: LABELS.CHOOSE_NEW_FOLDER,
+          description: "Select a different location",
+          target: null,
+        },
+      ];
+
       if (
         targetFolder !== null &&
         targetFolder !== "" &&
         PathUtils.exists(targetFolder)
       ) {
-        // Ask user if they want to use existing target folder
-        const useExisting = await vscode.window.showQuickPick(
-          [
-            {
-              label: LABELS.USE_EXISTING_FOLDER,
-              description: targetFolder,
-              target: targetFolder,
-            },
-            {
-              label: LABELS.CHOOSE_NEW_FOLDER,
-              description: "Select a different location",
-              target: null,
-            },
-          ],
-          {
-            placeHolder: "Select target folder for summary output",
-            ignoreFocusOut: true,
-          }
-        );
+        pickOptions.unshift({
+          label: LABELS.USE_EXISTING_FOLDER,
+          description: targetFolder,
+          target: targetFolder,
+        });
+      }
 
-        if (!useExisting) {
-          return; // User cancelled
-        }
+      // Ask user if they want to use existing target folder
+      const useExisting = await vscode.window.showQuickPick(pickOptions, {
+        placeHolder: "Select target folder for summary output",
+        ignoreFocusOut: true,
+      });
 
-        if (useExisting.target === null) {
-          targetFolder =
-            await this.configManager.showSelectTargetFolderDialog();
-        }
-      } else {
+      if (!useExisting) {
+        return; // User cancelled
+      }
+
+      if (useExisting.target === null) {
         targetFolder = await this.configManager.showSelectTargetFolderDialog();
+      }
+
+      if (useExisting.target === defaultTargetFolder) {
+        targetFolder =
+          await this.configManager.updateTargetFolderToDefaultFolder();
       }
 
       if (!targetFolder) {
@@ -79,7 +94,7 @@ export class SummaryOneFileCommand {
             targetFolder,
             progress
           );
-          await this.showResults(result);
+          void this.showResults(result);
         }
       );
     } catch (error) {
@@ -125,7 +140,10 @@ export class SummaryOneFileCommand {
     });
 
     // Save structure to separate JSON file
-    const structureFilePath = path.join(targetFolder, OUTPUT_FILES.PROJECT_STRUCTURE);
+    const structureFilePath = path.join(
+      targetFolder,
+      OUTPUT_FILES.PROJECT_STRUCTURE
+    );
     await structureSummarizer.saveStructureToFile(structure, structureFilePath);
 
     progress.report({ message: PROGRESS.STRUCTURE_COMPLETE, increment: 30 });
@@ -133,7 +151,10 @@ export class SummaryOneFileCommand {
     // Phase 2: Append tracked files content to separate file
     progress.report({ message: PROGRESS.PROCESSING_FILES, increment: 30 });
 
-    const combinedFilePath = path.join(targetFolder, OUTPUT_FILES.COMBINED_FILES);
+    const combinedFilePath = path.join(
+      targetFolder,
+      OUTPUT_FILES.COMBINED_FILES
+    );
     const fileResults = await fileTracker.trackAndWriteToSingleFile({
       workspacePath,
       targetPath: combinedFilePath,
@@ -175,7 +196,10 @@ export class SummaryOneFileCommand {
       );
     } else if (action === LABELS.OPEN_STRUCTURE) {
       const folderPath = PathUtils.getDirName(result.targetPath);
-      const structurePath = path.join(folderPath, OUTPUT_FILES.PROJECT_STRUCTURE);
+      const structurePath = path.join(
+        folderPath,
+        OUTPUT_FILES.PROJECT_STRUCTURE
+      );
       await vscode.commands.executeCommand(
         "vscode.open",
         vscode.Uri.file(structurePath)

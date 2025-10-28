@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { ConfigKey, SummaryToolConfig } from "../models/types";
+import { PathUtils } from "../utils/pathUtils";
 
 export class ConfigManager {
   private static instance: ConfigManager;
@@ -18,10 +19,24 @@ export class ConfigManager {
     const config = vscode.workspace.getConfiguration();
     return {
       targetFolder: config.get<string>(ConfigKey.TARGET_FOLDER) || "",
+      defaultTargetFolder:
+        config.get<string>(ConfigKey.DEFAULT_TARGET_FOLDER) ||
+        ".claude/contexts",
       track: config.get<string[]>(ConfigKey.TRACK) || [],
       untrack: config.get<string[]>(ConfigKey.UNTRACK) || [],
       ignoreStructure: config.get<string[]>(ConfigKey.IGNORE_STRUCTURE) || [],
     };
+  }
+
+  public async updateTargetFolderToDefaultFolder(): Promise<string> {
+    const defaultTargetFolder = this.getDefaultTargetFolderPath();
+    // Create that folder if it doesn't exist
+    const result = await PathUtils.getAbsolutePathFromWorkspace(
+      defaultTargetFolder
+    );
+    await PathUtils.ensureDirectoryExists(result);
+    await this.updateTargetFolder(result);
+    return result;
   }
 
   public async updateTargetFolder(targetFolder: string): Promise<void> {
@@ -143,7 +158,7 @@ export class ConfigManager {
           updatedIgnoreStructure,
           vscode.ConfigurationTarget.Workspace
         );
-      vscode.window.showInformationMessage(
+      vscode.window.setStatusBarMessage(
         `Removed folder from ignore structure: ${relativePath}`
       );
     } else {
@@ -155,7 +170,7 @@ export class ConfigManager {
           updatedIgnoreStructure,
           vscode.ConfigurationTarget.Workspace
         );
-      vscode.window.showInformationMessage(
+      vscode.window.setStatusBarMessage(
         `Added folder to ignore structure: ${relativePath}`
       );
     }
@@ -212,6 +227,16 @@ export class ConfigManager {
   public getWorkspacePath(): string | undefined {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     return workspaceFolders?.[0]?.uri.fsPath;
+  }
+
+  public getTargetFolder(): string {
+    const config = this.getConfig();
+    return config.targetFolder;
+  }
+
+  public getDefaultTargetFolderPath(): string {
+    const config = this.getConfig();
+    return config.defaultTargetFolder;
   }
 
   public isItemTracked(itemPath: string): boolean {
