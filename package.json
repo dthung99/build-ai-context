@@ -137,7 +137,10 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "release:patch": "npm version patch -m 'Release v%s' && git push --follow-tags",
+    "release:minor": "npm version minor -m 'Release v%s' && git push --follow-tags",
+    "release:major": "npm version major -m 'Release v%s' && git push --follow-tags"
   },
   "devDependencies": {
     "@types/glob-to-regexp": "^0.4.4",
