@@ -1,4 +1,4 @@
-# Build AI Context
+# Build AI Context Extension
 
 A VS Code extension that helps you summarize project structures and extract specific files for documentation, analysis, or sharing purposes.
 
