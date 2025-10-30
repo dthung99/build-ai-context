@@ -41,16 +41,17 @@ export class PathUtils {
   /**
    * Ensure file exists, create if it doesn't (also ensures parent directory)
    */
-  public static ensureFileExists(filePath: string): void {
+  public static createEmptyFile(filePath: string): void {
     const dirPath = path.dirname(filePath);
 
     // First ensure the directory exists
     this.ensureDirectoryExists(dirPath);
 
-    // Then ensure the file exists
-    if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(filePath, ""); // Creates empty file
+    // Create or recreate the file (delete if exists, then create empty)
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath); // Delete existing file
     }
+    fs.writeFileSync(filePath, ""); // Create empty file
   }
 
   /**

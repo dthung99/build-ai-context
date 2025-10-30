@@ -95,7 +95,7 @@ export class FileTracker {
     this.skippedFiles = 0;
 
     // Ensure target directory exists
-    PathUtils.ensureFileExists(targetPath);
+    PathUtils.createEmptyFile(targetPath);
 
     this.progress?.report({ message: "Analyzing tracked files..." });
 
